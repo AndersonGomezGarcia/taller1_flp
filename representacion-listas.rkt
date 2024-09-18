@@ -146,29 +146,29 @@
 ; Area del programador
 
 (define chip1
-  (comp-chip
+  (comp_chip
   '(INA INB INC IND)
   '(OUTA)
   (cir_comp
     (cir_simple '(a b) '(e)
-      (prim-chip (prim_and)))
+      (prim_chip (prim_and)))
     (list
       (cir_simple '(c d) '(f)
-        (prim-chip (prim_and)))
+        (prim_chip (prim_and)))
       (cir_simple '(e f) '(g)
-        (prim-chip (prim_or))))
+        (prim_chip (prim_or))))
   '(a b c d)
   '(g))))
 
 (define circuito1
   (cir_comp
     (cir_simple '(a b) '(e)
-      (prim-chip (prim_and)))
+      (prim_chip (prim_and)))
     (list
       (cir_simple '(c d) '(f)
-        (prim-chip (prim_and)))
+        (prim_chip (prim_and)))
       (cir_simple '(e f) '(g)
-        (prim-chip (prim_or))))
+        (prim_chip (prim_or))))
   '(a b c d)
   '(g)
   )
