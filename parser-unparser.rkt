@@ -94,107 +94,156 @@
 ;Area del programador
 
 ;Listas
-(define chip1-list
+(define chip2-list
   '(comp_chip
-    (INA INB INC IND)
-    (OUTA)
+    (INX INY INZ)
+    (OUTX)
     (cir_comp
-      (cir_simple (a b) (e)
-        (prim_chip (prim_and)))
-      ((cir_simple (c d) (f)
-         (prim_chip (prim_and)))
-       (cir_simple (e f) (g)
-         (prim_chip (prim_or))))
-      (a b c d)
-      (g))))
+      (cir_simple (x1 x2) (y1)
+        (prim_chip (prim_xor)))
+      ((cir_simple (x3 x4) (y2)
+         (prim_chip (prim_nand)))
+       (cir_simple (y1 y2) (y3)
+         (prim_chip (prim_and))))
+      (x1 x2 x3 x4)
+      (y3))))
 
-(define cir1-list
-  '(cir_comp
-    (cir_simple (a b) (e)
-      (prim_chip (prim_and)))
-    ((cir_simple (c d) (f)
-       (prim_chip (prim_and)))
-     (cir_simple (e f) (g)
-       (prim_chip (prim_or))))
-    (a b c d)
-    (g)))
+(define chip3-list
+  '(comp_chip
+    (IN1 IN2 IN3)
+    (OUT1)
+    (cir_comp
+      (cir_simple (x y) (z)
+        (prim_chip (prim_nor)))
+      ((cir_simple (p q) (r)
+         (prim_chip (prim_xor)))
+       (cir_simple (z r) (s)
+         (prim_chip (prim_not))))
+      (x y p q)
+      (s))))      
 
-(define cir2-list
+(define cir3-list
   '(cir_comp
-    (cir_simple (m n o p) (e f)
+    (cir_simple (p q) (r)
+      (prim_chip (prim_or)))
+    ((cir_simple (s t) (u)
+       (prim_chip (prim_xnor)))
+     (cir_simple (r u) (v)
+       (prim_chip (prim_not))))
+    (p q s t)
+    (v)))
+
+(define cir4-list
+  '(cir_comp
+    (cir_simple (m n o) (p q)
       (comp_chip
-        (INA INB INC IND)
-        (OUTE OUTF)
+        (IN1 IN2 IN3)
+        (OUT1 OUT2)
         (cir_comp
-          (cir_simple (a b) (e)
-            (prim_chip (prim_and)))  
-          ((cir_simple (c d) (f)
-             (prim_chip (prim_and)))) 
-          (a b c d)
-          (e f))))
-    ((cir_simple (e f) (z)
+          (cir_simple (a b) (c)
+            (prim_chip (prim_nor)))
+          ((cir_simple (d e) (f)
+             (prim_chip (prim_nand))))
+          (a b d e)
+          (c f))))
+    ((cir_simple (p q) (r)
        (comp_chip
-         (INE INF)
-         (OUTA)
-         (cir_simple (e f) (g)
-           (prim_chip (prim_or)))))) 
-    (m n o p)
-    (z)))
+         (IN4 IN5)
+         (OUT3)
+         (cir_simple (p q) (s)
+           (prim_chip (prim_xor)))))) 
+    (m n o)
+    (r)))
 
+(define cir5-list
+  '(cir_comp
+    (cir_simple (a1 a2) (b1)
+      (prim_chip (prim_nand)))
+    ((cir_simple (b1 b2) (c1)
+       (prim_chip (prim_or)))
+     (cir_simple (c1 c2) (d1)
+       (prim_chip (prim_and))))
+    (a1 a2 b2 c2)
+    (d1)))    
 
 
 
 ; AST
-(define chip1
+(define chip2
   (comp_chip
-  '(INA INB INC IND)
-  '(OUTA)
-  (cir_comp
-    (cir_simple '(a b) '(e)
-      (prim_chip (prim_and)))
-    (list
-      (cir_simple '(c d) '(f)
-        (prim_chip (prim_and)))
-      (cir_simple '(e f) '(g)
-        (prim_chip (prim_or))))
-  '(a b c d)
-  '(g))))
-
-(define cir1
-  (cir_comp
-    (cir_simple '(a b) '(e)
-      (prim_chip (prim_and)))
-    (list
-      (cir_simple '(c d) '(f)
-        (prim_chip (prim_and)))
-      (cir_simple '(e f) '(g)
-        (prim_chip (prim_or))))
-  '(a b c d)
-  '(g)
-  )
-)
-
-(define cir2
-  (cir_comp
-   (cir_simple '(m n o p) '(e f)
-    (comp_chip
-     '(INA INB INC IND)
-     '(OUTE OUTF)
-     (cir_comp
-      (cir_simple '(a b) '(e)
-        (prim_chip (prim_and)))  
+    '(INX INY INZ)
+    '(OUTX)
+    (cir_comp
+      (cir_simple '(x1 x2) '(y1)
+        (prim_chip (prim_xor)))
       (list
-       (cir_simple '(c d) '(f)
-         (prim_chip (prim_and))))  
-      '(a b c d)
-      '(e f))))
+        (cir_simple '(x3 x4) '(y2)
+          (prim_chip (prim_nand)))
+        (cir_simple '(y1 y2) '(y3)
+          (prim_chip (prim_and))))
+      '(x1 x2 x3 x4)
+      '(y3))))
+
+(define chip3
+  (comp_chip
+    '(IN1 IN2 IN3)
+    '(OUT1)
+    (cir_comp
+      (cir_simple '(x y) '(z)
+        (prim_chip (prim_nor)))
+      (list
+        (cir_simple '(p q) '(r)
+          (prim_chip (prim_xor)))
+        (cir_simple '(z r) '(s)
+          (prim_chip (prim_not))))
+      '(x y p q)
+      '(s))))
+
+(define cir3
+  (cir_comp
+    (cir_simple '(p q) '(r)
+      (prim_chip (prim_or)))
+    (list
+      (cir_simple '(s t) '(u)
+        (prim_chip (prim_xnor)))
+      (cir_simple '(r u) '(v)
+        (prim_chip (prim_not))))
+    '(p q s t)
+    '(v)))
+
+(define cir4
+  (cir_comp
+   (cir_simple '(m n o) '(p q)
+    (comp_chip
+     '(IN1 IN2 IN3)
+     '(OUT1 OUT2)
+     (cir_comp
+      (cir_simple '(a b) '(c)
+        (prim_chip (prim_nor)))  
+      (list
+       (cir_simple '(d e) '(f)
+         (prim_chip (prim_nand))))  
+      '(a b d e)
+      '(c f))))
    (list
-    (cir_simple '(e f) '(z)
+    (cir_simple '(p q) '(r)
      (comp_chip
-      '(INE INF)
-      '(OUTA)
-      (cir_simple '(e f) '(g)
-        (prim_chip (prim_or))))))  
-   '(m n o p)
-   '(z)))
+      '(IN4 IN5)
+      '(OUT3)
+      (cir_simple '(p q) '(s)
+        (prim_chip (prim_xor))))))  
+   '(m n o)
+   '(r)))
+
+(define cir5
+  (cir_comp
+    (cir_simple '(a1 a2) '(b1)
+      (prim_chip (prim_nand)))
+    (list
+      (cir_simple '(b1 b2) '(c1)
+        (prim_chip (prim_or)))
+      (cir_simple '(c1 c2) '(d1)
+        (prim_chip (prim_and))))
+    '(a1 a2 b2 c2)
+    '(d1)))
 
