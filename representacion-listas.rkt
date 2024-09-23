@@ -8,23 +8,23 @@
 ; Constructores
 (define cir_simple
     (lambda (c1 c2 ch)
-        (list 'cir_simple c1 c2 ch)))
+        (list 'cir_simple c1 c2 ch))) ; c1 y c2 hacen referencia a los cables y ch al chip
 
 (define cir_comp
-    (lambda (cir1 cir2 c1 c2)
-        (list 'cir_comp cir1 cir2 c1 c2)))
-
+    (lambda (cir1 lcirs c1 c2)
+        (list 'cir_comp cir1 lcirs c1 c2))); cir1 es un circuito, lcircs es una lista de circuitos y c1 y c2 son cables (input output)
+        
 (define  prim_chip
     (lambda (chip_prim)
-        (list 'prim-chip chip_prim)))
+        (list 'prim-chip chip_prim))) ; chip_prim es un chip primitivo
 
 (define comp_chip
     (lambda (in out cir1)
-        (list 'comp-chip in out cir1)))
+        (list 'comp-chip in out cir1))) ; in y out son cables y cir1 es un circuito
 
 (define prim_or
     (lambda ()
-        (list 'chip-or)))
+        (list 'chip-or))) 
 
 (define prim_and
     (lambda ()
@@ -114,7 +114,7 @@
     (lambda (x)
         (cadr x)))
 
-(define cir_comp->cir2
+(define cir_comp->lcircs
     (lambda (x)
         (caddr x)))
 
@@ -145,32 +145,114 @@
 
 ; Area del programador
 
-(define chip1
-  (comp_chip
-  '(INA INB INC IND)
-  '(OUTA)
-  (cir_comp
-    (cir_simple '(a b) '(e)
-      (prim_chip (prim_and)))
-    (list
-      (cir_simple '(c d) '(f)
-        (prim_chip (prim_and)))
-      (cir_simple '(e f) '(g)
-        (prim_chip (prim_or))))
-  '(a b c d)
-  '(g))))
+; Ejemplos circuitos
 
-(define circuito1
+(define cir1
   (cir_comp
-    (cir_simple '(a b) '(e)
-      (prim_chip (prim_and)))
-    (list
-      (cir_simple '(c d) '(f)
-        (prim_chip (prim_and)))
-      (cir_simple '(e f) '(g)
-        (prim_chip (prim_or))))
-  '(a b c d)
-  '(g)
-  )
+   (cir_simple '(x1 x2) '(y1 y2)
+    (comp_chip
+     '(IN1 IN2) ; Lista de cables de entrada
+     '(OUT1 OUT2); Lista de cables de salida
+     (cir_simple '(a b) '(c)
+      (prim_chip (prim_nand)))))
+   (list ; Lista de circuitos
+    (cir_simple '(d e) '(f)
+     (comp_chip ; Chip compuesto
+      '(IN3 IN4)
+      '(OUT3)
+      (cir_simple '(g h) '(i)
+       (prim_chip (prim_xor))))))
+   '(x1 x2 d e); Lista de cables de entrada
+   '(y1 y2 f) ; Lista de cables de salida
+   )
 )
 
+(define cir2
+  (cir_comp
+   (cir_simple '(w1 w2) '(z1 z2) ; circuito simple (cir1)
+    (comp_chip ; chip compuesto
+     '(INX INY)
+     '(OUTX OUTY)
+     (cir_comp  ; circuito del chip compuesto
+      (cir_simple '(k l) '(m)
+        (prim_chip (prim_xor)))
+      (list ; Lista de circuitos del cir_comp del chip_comp
+       (cir_simple '(n o) '(p)
+         (prim_chip (prim_or))))
+      '(k l n o)
+      '(m p))))
+   (list ; lista de circuitos del cir_comp
+    (cir_simple '(q r) '(s)
+     (prim_chip (prim_and))))
+   '(w1 w2 q r) ; cables de entrada
+   '(z1 z2 s) ; cables de salida
+   )
+)
+
+(define cir3
+  (cir_comp
+   (cir_simple '(u v) '(w) ; circuito simple
+    (prim_chip (prim_nor))) ; chip primitivo
+   (list ; lista de circuitos
+    (cir_simple '(x y) '(z)
+     (prim_chip (prim_xnor)))
+    (cir_simple '(a b) '(c)
+     (prim_chip (prim_or))))
+   '(u v x y a b) ; cables de entrada
+   '(w z c); cables de salida
+   )
+)
+
+(define cir4
+  (cir_simple '(p q) '(r) ; circuito simple
+   (comp_chip ; chip compuesto
+    '(IN1 IN2)
+    '(OUT1)
+    (cir_simple '(s t) '(u) ; circuito simple del chip_compuesto
+     (prim_chip (prim_not))))))
+
+
+; Ejemplos chips
+
+(define chip1
+  (comp_chip ; chip compuesto
+   '(IN_A IN_B)
+   '(OUT_A OUT_B)
+   (cir_comp
+    (cir_simple '(i1 i2) '(o1)
+      (prim_chip (prim_and)))
+    (list ; lista de circuitos
+     (cir_simple '(i3 i4) '(o2)
+       (prim_chip (prim_nor))))
+    '(i1 i2 i3 i4); cables de entrada
+    '(o1 o2)); cables de salida
+    )
+)
+
+(define chip2
+  (comp_chip
+   '(IN_A IN_B IN_C) ; cables de entrada
+   '(OUT_X OUT_Y OUT_Z) ; cables de salida
+   (cir_comp ; circuito compuesto
+    (cir_simple '(a b) '(x)
+     (prim_chip (prim_xor)))
+    (list ; lista de circuitos 
+     (cir_simple '(c d) '(y)
+      (prim_chip (prim_and)))
+     (cir_simple '(e f) '(z)
+      (comp_chip
+       '(IN1 IN2)
+       '(OUT1)
+       (cir_comp
+        (cir_simple '(g h) '(j)
+         (prim_chip (prim_or)))
+        (list ; lista de circuitos
+         (cir_simple '(k l) '(m)
+          (prim_chip (prim_not))))
+        '(g h k l)
+        '(j m))))) 
+    '(a b c d e f) ; cables de entrada
+    '(x y z); cables de salida
+    )
+    )
+)
